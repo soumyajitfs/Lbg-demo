@@ -155,20 +155,21 @@ const DocumentSection = ({ caseId }) => {
   );
 };
 
-const NoteSection = ({ caseId }) => {
-  const [notes, setNotes] = useState([]);
+const NoteSection = ({ caseId, initialNotes = [] }) => {
+  const [notes, setNotes] = useState(initialNotes.map((n) => ({ ...n })));
   const [newNote, setNewNote] = useState("");
 
   const handleAddNote = () => {
     if (!newNote.trim()) return;
     const now = new Date();
     const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    const nextId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) + 1 : 1;
     setNotes([
       ...notes,
       {
-        id: notes.length + 1,
+        id: nextId,
         text: newNote.trim(),
-        author: "Demo User",
+        author: "John Smith",
         timestamp,
       },
     ]);
@@ -370,7 +371,7 @@ const DSARDetail = () => {
           <h5 className="mb-0">Notes</h5>
         </div>
         <div className="card-body p-4">
-          <NoteSection caseId={record.caseId} />
+          <NoteSection caseId={record.caseId} initialNotes={record.notes || []} />
         </div>
       </div>
     </div>

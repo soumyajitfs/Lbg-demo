@@ -2,6 +2,31 @@
 // Ticketing Management System — Mock Data
 // Each DSAR ticket can have MULTIPLE products
 // ============================================================
+
+// ── Helper: generate 10 pre-populated notes for a given created date ──
+const buildNotes = (baseDate) => {
+  const texts = [
+    "Customer profile found under current address on PBS and Cobra.",
+    "Additional address found added on pega.(No profile found)",
+    "Product found.",
+    "YPSOR trawl added pluto updated",
+    "Setup pack, CINS and Hub attached. Archive Memos updated.",
+    "YPSOR updated on SharePoint and uploaded under PLUTO.",
+    "30 90 days customer ACK letter attached with specified product.",
+    "Homeworking spreadsheet updated.",
+    "Calls spreadsheet updated.",
+    "Setup pack and 30 days ACK letter attached on PEGA.",
+  ];
+  const authors = ["John Smith", "Sarah Connor", "Emily Davis"];
+  const base = new Date(baseDate);
+  return texts.map((text, i) => {
+    const d = new Date(base);
+    d.setHours(9 + i, i * 7 % 60, 0);
+    const ts = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    return { id: i + 1, text, author: authors[i % authors.length], timestamp: ts };
+  });
+};
+
 export const ticketRecords = [
   {
     caseId: "DSAR-001",
@@ -19,6 +44,7 @@ export const ticketRecords = [
       { productId: "PROD-5010", productName: "Savings", rollNumber: "RL-110005" },
       { productId: "PROD-5011", productName: "Loan", rollNumber: "RL-110006" },
     ],
+    notes: buildNotes("2026-01-15"),
   },
   {
     caseId: "DSAR-002",
@@ -35,6 +61,7 @@ export const ticketRecords = [
       { productId: "PROD-5002", productName: "Mortgage", rollNumber: "RL-220001" },
       { productId: "PROD-5012", productName: "Credit Card", rollNumber: "RL-220005" },
     ],
+    notes: buildNotes("2026-01-22"),
   },
   {
     caseId: "DSAR-003",
@@ -52,6 +79,7 @@ export const ticketRecords = [
       { productId: "PROD-5013", productName: "Savings", rollNumber: "RL-330005" },
       { productId: "PROD-5014", productName: "Mortgage", rollNumber: "RL-330006" },
     ],
+    notes: buildNotes("2026-02-01"),
   },
   {
     caseId: "DSAR-004",
@@ -68,6 +96,7 @@ export const ticketRecords = [
       { productId: "PROD-5005", productName: "Savings", rollNumber: "RL-110002" },
       { productId: "PROD-5015", productName: "Credit Card", rollNumber: "RL-110007" },
     ],
+    notes: buildNotes("2026-02-05"),
   },
   {
     caseId: "DSAR-005",
@@ -85,6 +114,7 @@ export const ticketRecords = [
       { productId: "PROD-5016", productName: "Loan", rollNumber: "RL-440005" },
       { productId: "PROD-5017", productName: "Savings", rollNumber: "RL-440006" },
     ],
+    notes: buildNotes("2026-02-06"),
   },
   {
     caseId: "DSAR-006",
@@ -101,5 +131,6 @@ export const ticketRecords = [
       { productId: "PROD-5006", productName: "Loan", rollNumber: "RL-220002" },
       { productId: "PROD-5018", productName: "Mortgage", rollNumber: "RL-220006" },
     ],
+    notes: buildNotes("2026-02-08"),
   },
 ];
