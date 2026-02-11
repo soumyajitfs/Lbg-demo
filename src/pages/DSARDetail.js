@@ -2,6 +2,159 @@ import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ticketRecords } from "../data/mockData";
 
+const DocumentSection = ({ caseId }) => {
+  const [documents, setDocuments] = useState([]);
+  const fileInputRef = React.useRef(null);
+
+  const getFileIcon = (fileName) => {
+    const ext = fileName.split(".").pop().toLowerCase();
+    if (["pdf"].includes(ext)) return { icon: "📄", color: "#dc3545", label: "PDF" };
+    if (["xlsx", "xls", "csv"].includes(ext)) return { icon: "📊", color: "#198754", label: "Excel" };
+    if (["doc", "docx"].includes(ext)) return { icon: "📝", color: "#0d6efd", label: "Word" };
+    if (["png", "jpg", "jpeg", "gif", "bmp"].includes(ext)) return { icon: "🖼️", color: "#6f42c1", label: "Image" };
+    if (["txt"].includes(ext)) return { icon: "📃", color: "#6c757d", label: "Text" };
+    return { icon: "📎", color: "#495057", label: ext.toUpperCase() };
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  };
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    const newDocs = files.map((file, idx) => ({
+      id: documents.length + idx + 1,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      uploadedBy: "John Smith",
+      timestamp,
+    }));
+    setDocuments([...documents, ...newDocs]);
+    // Reset file input
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleRemove = (docId) => {
+    setDocuments(documents.filter((d) => d.id !== docId));
+  };
+
+  return (
+    <div>
+      {/* Uploaded Documents List */}
+      {documents.length > 0 && (
+        <div className="mb-4" id="documents-list">
+          <div className="table-responsive">
+            <table className="table table-hover mb-0" id="table-documents">
+              <thead>
+                <tr>
+                  <th className="py-2 ps-3" style={{ width: 40 }}>#</th>
+                  <th className="py-2">File Name</th>
+                  <th className="py-2">Type</th>
+                  <th className="py-2">Size</th>
+                  <th className="py-2">Uploaded By</th>
+                  <th className="py-2">Date</th>
+                  <th className="py-2 text-center" style={{ width: 80 }}>Action</th>
+                </tr>
+              </thead>
+              <tbody id="table-documents-body">
+                {documents.map((doc, index) => {
+                  const fileInfo = getFileIcon(doc.name);
+                  return (
+                    <tr key={doc.id} id={`document-row-${index}`}>
+                      <td className="ps-3">{index + 1}</td>
+                      <td id={`document-name-${index}`}>
+                        <span style={{ marginRight: 8 }}>{fileInfo.icon}</span>
+                        {doc.name}
+                      </td>
+                      <td>
+                        <span
+                          className="badge"
+                          style={{
+                            backgroundColor: fileInfo.color,
+                            color: "#fff",
+                            fontSize: "0.75rem",
+                          }}
+                        >
+                          {fileInfo.label}
+                        </span>
+                      </td>
+                      <td className="text-muted">{formatFileSize(doc.size)}</td>
+                      <td>{doc.uploadedBy}</td>
+                      <td className="text-muted">{doc.timestamp}</td>
+                      <td className="text-center">
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          id={`btn-remove-doc-${index}`}
+                          title="Remove"
+                          onClick={() => handleRemove(doc.id)}
+                        >
+                          ✕
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Upload Control */}
+      <div id="upload-document-section">
+        <label className="form-label">Upload Document</label>
+        <div className="d-flex align-items-center gap-2">
+          <input
+            type="text"
+            className="form-control"
+            id="upload-file-display"
+            placeholder="Choose a file (PDF, Excel, Word, or any file)..."
+            readOnly
+            style={{ cursor: "pointer", backgroundColor: "#fff" }}
+            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+          />
+          <button
+            className="btn btn-lbg d-flex align-items-center justify-content-center"
+            id="btn-upload-document"
+            title="Browse and upload file"
+            style={{ minWidth: 48, height: 38 }}
+            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+              <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+            </svg>
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            id="input-file-upload"
+            style={{ display: "none" }}
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.png,.jpg,.jpeg,.gif,.msg,.eml"
+            multiple
+            onChange={handleFileSelect}
+          />
+        </div>
+        <div className="form-text mt-1">
+          Supported: PDF, Word, Excel, Images, Text, and more
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const NoteSection = ({ caseId }) => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
@@ -198,6 +351,16 @@ const DSARDetail = () => {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      {/* Documents Section */}
+      <div className="card shadow-sm border-0 mt-4">
+        <div className="card-header text-white py-3">
+          <h5 className="mb-0">Documents</h5>
+        </div>
+        <div className="card-body p-4">
+          <DocumentSection caseId={record.caseId} />
         </div>
       </div>
 
